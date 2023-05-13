@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>User List</title>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
   </head>
   <body>
     <h1>User List</h1>
@@ -10,5 +12,52 @@
         <li>{{ user["name"] }} - {{ user["email"] }}</li>
       {% endfor %}
     </ul>
+    <form id="add-user-form"> 
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control" id="name" name="name">
+      </div>
+      <div class="form-group">
+        <label for="email">Email address:</label>
+        <input type="email" class="form-control" id="email" name="email">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <form action="/" method="POST">
+      <input type="hidden" name="_method" value="DELETE">
+      <input type="submit" value="Delete Data">
+    </form>
+    <button id="fetch-users-btn">Fetch Users</button>
+    <div id="users"></div>
+    <script src="{{ url_for('static', filename='jquery-3.7.0.js') }}"></script>
+    <script>
+      // Add event listener to the form's submit event
+      $('#add-user-form').on('submit', function(event) {
+        // Prevent the default form submission action
+        event.preventDefault();
+
+        // Get the form data
+        var formData = {
+          'name': $('#name').val(),
+          'email': $('#email').val()
+        };
+
+        // Make an AJAX request to add the user to the Flask server
+        $.ajax({
+          type: 'POST',
+          url: '/add',
+          data: JSON.stringify(formData),
+          contentType: 'application/json;charset=UTF-8',
+          success: function(data) {
+            // Add the new user to the <ul> without refreshing the page
+            var userHtml = '<li>' + formData.name + ' - ' + formData.email + '</li>';
+            $('ul').append(userHtml);
+          },
+          error: function() {
+            alert('Failed to add user');
+          }
+        });
+      });
+    </script>
   </body>
 </html>
